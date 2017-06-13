@@ -7,11 +7,19 @@
 //
 
 #import "AKAppDelegate.h"
+#import "AKViewController.h"
+#import "AKTestView.h"
 
 @implementation AKAppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    UIWindow *window = [[UIWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
+    self.window = window;
+    [self.window makeKeyAndVisible];
+    
+    self.window.rootViewController = [[AKViewController alloc] init];
+    
     // Override point for customization after application launch.
     return YES;
 }

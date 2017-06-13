@@ -5,7 +5,6 @@ target 'AKPrompter_Example' do
 
   target 'AKPrompter_Tests' do
     inherit! :search_paths
-
     
   end
 end
