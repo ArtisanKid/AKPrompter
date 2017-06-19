@@ -8,6 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 typedef void (^AKPromptComplete) ();
 
 @protocol AKPromptContentProtocol <NSObject>
@@ -30,3 +32,5 @@ typedef void (^AKPromptComplete) ();
 - (void)disappear;
 
 @end
+
+NS_ASSUME_NONNULL_END

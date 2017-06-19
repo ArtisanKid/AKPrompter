@@ -7,7 +7,6 @@
 //
 
 #import "AKPromptManager.h"
-#import "AKPrompt.h"
 #import "AKPrompterMacro.h"
 
 @interface AKPromptManager ()
@@ -86,6 +85,11 @@ static void AKPromptManagerHook() {
 
 #pragma mark - Public Method
 + (void)prompt:(id<AKPromptProtocol>)prompt {
+    if(!prompt) {
+        AKPrompterLog(@"prompt不可为空");
+        return;
+    }
+    
     dispatch_semaphore_wait(self.manager.semaphore, DISPATCH_TIME_FOREVER);
     [self.manager.waitingPromptsM addObject:prompt];
     dispatch_semaphore_signal(self.manager.semaphore);
@@ -98,6 +102,11 @@ static void AKPromptManagerHook() {
 }
 
 + (void)cancle:(id<AKPromptProtocol>)prompt {
+    if(!prompt) {
+        AKPrompterLog(@"prompt不可为空");
+        return;
+    }
+    
     dispatch_semaphore_wait(self.manager.semaphore, DISPATCH_TIME_FOREVER);
     [self.manager.waitingPromptsM removeObject:prompt];
     [self.manager.queuePromptsM removeObject:prompt];
@@ -125,7 +134,7 @@ static void AKPromptManagerHook() {
                 continue;
             }
             
-            //总是插入相同优先级之后，模仿系统
+            //总是插入相同优先级之前，模仿系统
             for(NSInteger i = 0; i < promptsM.count; i++) {
                 id<AKPromptProtocol> _prompt = promptsM[i];
                 if(prompt.priority >= _prompt.priority) {
@@ -179,7 +188,7 @@ static void AKPromptManagerHook() {
     
     __weak typeof(self) weak_self = self;
     [self.currentPrompt.content appearInWindow:self.window complete:^{
-        __weak typeof(weak_self) strong_self = weak_self;
+        __strong typeof(weak_self) strong_self = weak_self;
         [strong_self.queuePromptsM removeObject:strong_self.currentPrompt];
         strong_self.currentPrompt = nil;
         [strong_self promptNext];

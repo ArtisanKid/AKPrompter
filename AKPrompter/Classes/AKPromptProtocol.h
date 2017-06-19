@@ -26,7 +26,11 @@ typedef NS_ENUM (NSUInteger, AKPromptPriority) {
     AKPromptPriorityRequired, //最高
 };
 
+NS_ASSUME_NONNULL_BEGIN
+
 @protocol AKPromptProtocol <NSObject>
+
+@required
 
 /**
  content为UIViewController会自动设置为UIWindow的rootViewController，然后调用协议方法
@@ -36,6 +40,8 @@ typedef NS_ENUM (NSUInteger, AKPromptPriority) {
 @property (nonatomic, strong, readonly) id<AKPromptContentProtocol> content;
 
 @property (nonatomic, assign, readonly) AKPromptMoment moment;
-@property (nonatomic, assign, readonly) AKPromptPriority priority;
+@property (nonatomic, assign, readonly) NSUInteger priority;
 
 @end
+
+NS_ASSUME_NONNULL_END

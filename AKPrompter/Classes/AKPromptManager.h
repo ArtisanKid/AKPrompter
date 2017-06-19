@@ -9,6 +9,8 @@
 #import <Foundation/Foundation.h>
 #import "AKPromptProtocol.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface AKPromptManager : NSObject
 
 /**
@@ -27,3 +29,5 @@
 + (void)cancle:(id<AKPromptProtocol>)prompt;
 
 @end
+
+NS_ASSUME_NONNULL_END
