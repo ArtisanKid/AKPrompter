@@ -1,0 +1,16 @@
+PODS:
+  - AKPrompter (0.1.0)
+
+DEPENDENCIES:
+  - AKPrompter (from `../`)
+
+EXTERNAL SOURCES:
+  AKPrompter:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  AKPrompter: b53ae31d5b44e5503c11e9a5ce27f5ebe73461e1
+
+PODFILE CHECKSUM: 23b35b8418b876a5cf27f0adaac42cc040ba8d9d
+
+COCOAPODS: 1.2.1
