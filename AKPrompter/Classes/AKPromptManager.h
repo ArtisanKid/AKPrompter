@@ -15,6 +15,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  弹窗
+ 当使用UIAlertController时，需要使用最佳实践，否则会出现视图层叠现象
+ 参考https://stackoverflow.com/questions/26554894/how-to-present-uialertcontroller-when-not-in-a-view-controller
 
  @param prompt id<AKPromptProtocol>
  */

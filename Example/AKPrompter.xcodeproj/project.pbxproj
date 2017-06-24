@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1D71892B1EFD21C200F926CC /* AKNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D71892A1EFD21C200F926CC /* AKNavigationController.m */; };
 		1D8FA2F71EEFC97500686E16 /* AKTestView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D8FA2F61EEFC97500686E16 /* AKTestView.m */; };
 		273E522A7142DE5B8F886528 /* Pods_AKPrompter_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C6E24BE700308B0084B7E22A /* Pods_AKPrompter_Tests.framework */; };
 		6003F58E195388D20070C39A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6003F58D195388D20070C39A /* Foundation.framework */; };
@@ -38,6 +39,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1D7189291EFD21C200F926CC /* AKNavigationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKNavigationController.h; sourceTree = "<group>"; };
+		1D71892A1EFD21C200F926CC /* AKNavigationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AKNavigationController.m; sourceTree = "<group>"; };
 		1D8441B7B7E0C56CAE6D06F3 /* AKPrompter.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = AKPrompter.podspec; path = ../AKPrompter.podspec; sourceTree = "<group>"; };
 		1D8FA2F51EEFC97500686E16 /* AKTestView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKTestView.h; sourceTree = "<group>"; };
 		1D8FA2F61EEFC97500686E16 /* AKTestView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AKTestView.m; sourceTree = "<group>"; };
@@ -138,6 +141,8 @@
 				6003F59C195388D20070C39A /* AKAppDelegate.h */,
 				6003F59D195388D20070C39A /* AKAppDelegate.m */,
 				873B8AEA1B1F5CCA007FD442 /* Main.storyboard */,
+				1D7189291EFD21C200F926CC /* AKNavigationController.h */,
+				1D71892A1EFD21C200F926CC /* AKNavigationController.m */,
 				6003F5A5195388D20070C39A /* AKViewController.h */,
 				6003F5A6195388D20070C39A /* AKViewController.m */,
 				71719F9D1E33DC2100824A3D /* LaunchScreen.storyboard */,
@@ -405,6 +410,7 @@
 				6003F59E195388D20070C39A /* AKAppDelegate.m in Sources */,
 				6003F5A7195388D20070C39A /* AKViewController.m in Sources */,
 				1D8FA2F71EEFC97500686E16 /* AKTestView.m in Sources */,
+				1D71892B1EFD21C200F926CC /* AKNavigationController.m in Sources */,
 				6003F59A195388D20070C39A /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

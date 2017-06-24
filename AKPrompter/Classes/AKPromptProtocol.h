@@ -10,7 +10,7 @@
 #import "AKPromptContentProtocol.h"
 
 //显示时机
-typedef NS_OPTIONS (NSUInteger, AKPromptMoment) {
+typedef NS_ENUM (NSUInteger, AKPromptMoment) {
     AKPromptMomentImmediate = 0, //直接显示
     
     AKPromptMomentLaunchFinish = 1 << 0, //启动

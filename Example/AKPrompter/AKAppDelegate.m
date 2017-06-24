@@ -7,6 +7,7 @@
 //
 
 #import "AKAppDelegate.h"
+#import "AKNavigationController.h"
 #import "AKViewController.h"
 #import "AKTestView.h"
 
@@ -18,7 +19,7 @@
     self.window = window;
     [self.window makeKeyAndVisible];
     
-    self.window.rootViewController = [[AKViewController alloc] init];
+    self.window.rootViewController = [[AKNavigationController alloc] initWithRootViewController:[[AKViewController alloc] init]];
     
     // Override point for customization after application launch.
     return YES;

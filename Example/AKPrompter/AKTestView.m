@@ -21,12 +21,12 @@
 - (instancetype)initWithColor:(UIColor *)color targetFrame:(CGRect)frame {
     self = [super initWithFrame:CGRectZero];
     if(self) {
-        self.backgroundColor = color;
+        self.backgroundColor = [color colorWithAlphaComponent:.3];
         
         self.targetFrame = frame;
         
         UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
-        button.frame = CGRectMake(0., 0., 50., 50.);
+        button.frame = UIScreen.mainScreen.bounds;
         [button addTarget:self action:@selector(buttonTouchUpInside:) forControlEvents:UIControlEventTouchUpInside];
         [self addSubview:button];
     }

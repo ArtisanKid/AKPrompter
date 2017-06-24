@@ -18,6 +18,8 @@
 @implementation AKViewController
 
 + (void)load {
+    return;
+    
     AKPrompt *prompt = [[AKPrompt alloc] init];
     prompt.moment = AKPromptMomentLaunchFinish;
     prompt.priority = AKPromptPriorityLow;
@@ -34,16 +36,54 @@
 	// Do any additional setup after loading the view, typically from a nib.
     self.view.backgroundColor = UIColor.whiteColor;
     
-    AKPrompt *prompt = [[AKPrompt alloc] init];
-    prompt.moment = AKPromptMomentImmediate;
-    prompt.priority = AKPromptPriorityRequired;
+//    return;
     
-    AKTestView *testView = [[AKTestView alloc] initWithColor:UIColor.greenColor targetFrame:CGRectMake(10., 100., 50., 50.)];
-    prompt.content = testView;
+//    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+//        UIAlertController *controller = [UIAlertController alertControllerWithTitle:@"系统弹窗" message:@"" preferredStyle:UIAlertControllerStyleAlert];
+//        UIAlertAction *action = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+//            
+//        }];
+//        [controller addAction:action];
+//        
+//        [self presentViewController:controller animated:YES completion:^{
+//            
+//        }];
+//    });
+//
+//    return;
     
-    [AKPromptManager prompt:prompt];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        AKPrompt *prompt = [[AKPrompt alloc] init];
+        prompt.moment = AKPromptMomentImmediate;
+        prompt.priority = AKPromptPriorityRequired;
+        
+        AKTestView *testView = [[AKTestView alloc] initWithColor:UIColor.greenColor targetFrame:UIScreen.mainScreen.bounds];
+        prompt.content = testView;
+        
+        [AKPromptManager prompt:prompt];
+        
+        //[[[UIAlertView alloc] initWithTitle:@"系统弹窗1" message:@"" delegate:nil cancelButtonTitle:@"Hidden" otherButtonTitles: nil] show];
+        
+        //[[[UIAlertView alloc] initWithTitle:@"系统弹窗2" message:@"" delegate:nil cancelButtonTitle:@"Hidden" otherButtonTitles: nil] show];
+    });
     
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    return;
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        UIAlertController *controller = [UIAlertController alertControllerWithTitle:@"系统弹窗" message:@"" preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *action = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+            
+        }];
+        [controller addAction:action];
+        
+        [self presentViewController:controller animated:YES completion:^{
+            
+        }];
+    });
+    
+    return;
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         AKPrompt *prompt1 = [[AKPrompt alloc] init];
         prompt1.moment = AKPromptMomentBecomeActive;
         prompt1.priority = AKPromptPriorityRequired;
@@ -59,6 +99,14 @@
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
+    return UIInterfaceOrientationMaskPortrait;
+}
+
+- (BOOL)shouldAutorotate {
+    return NO;
 }
 
 @end

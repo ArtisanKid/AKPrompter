@@ -24,8 +24,8 @@
 @property (nonatomic, strong) id<AKPromptProtocol> currentPrompt;
 
 @property (nonatomic, strong) dispatch_semaphore_t semaphore;
-@property (nonatomic, strong) dispatch_queue_t queue;
 
+@property (atomic, assign, getter=isOtherWindowVisible) BOOL otherWindowVisible;
 @property (nonatomic, strong) UIWindow *window;
 
 @end
@@ -34,6 +34,11 @@
 
 __attribute__((constructor))
 static void AKPromptManagerHook() {
+    [[NSNotificationCenter defaultCenter] addObserver:AKPromptManager.manager selector:@selector(onUIWindowDidBecomeVisibleNotification:) name:UIWindowDidBecomeVisibleNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:AKPromptManager.manager selector:@selector(onUIWindowDidBecomeHiddenNotification:) name:UIWindowDidBecomeHiddenNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:AKPromptManager.manager selector:@selector(onUIWindowDidBecomeKeyNotification:) name:UIWindowDidBecomeKeyNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:AKPromptManager.manager selector:@selector(onUIWindowDidResignKeyNotification:) name:UIWindowDidResignKeyNotification object:nil];
+    
     [[NSNotificationCenter defaultCenter] addObserver:AKPromptManager.manager selector:@selector(onUIApplicationDidFinishLaunchingNotification:) name:UIApplicationDidFinishLaunchingNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:AKPromptManager.manager selector:@selector(onUIApplicationDidBecomeActiveNotification:) name:UIApplicationDidBecomeActiveNotification object:nil];
     
@@ -60,9 +65,6 @@ static void AKPromptManagerHook() {
         sharedInstance.queuePromptsM = [NSMutableArray array];
         
         sharedInstance.semaphore = dispatch_semaphore_create(1);
-        
-        NSString *label = [NSString stringWithFormat:@"%@.AKPromptManager.serialQueue", NSBundle.mainBundle.bundleIdentifier];
-        sharedInstance.queue = dispatch_queue_create(label.UTF8String, DISPATCH_QUEUE_SERIAL);
     });
     return sharedInstance;
 }
@@ -92,13 +94,11 @@ static void AKPromptManagerHook() {
     
     dispatch_semaphore_wait(self.manager.semaphore, DISPATCH_TIME_FOREVER);
     [self.manager.waitingPromptsM addObject:prompt];
-    dispatch_semaphore_signal(self.manager.semaphore);
     
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if(prompt.moment == AKPromptMomentImmediate) {
-            [self.manager assignPromptWithMoment:AKPromptMomentImmediate];
-        }
-    });
+    if(prompt.moment == AKPromptMomentImmediate) {
+        [self.manager assignPromptWithMoment:AKPromptMomentImmediate];
+    }
+    dispatch_semaphore_signal(self.manager.semaphore);
 }
 
 + (void)cancle:(id<AKPromptProtocol>)prompt {
@@ -110,59 +110,78 @@ static void AKPromptManagerHook() {
     dispatch_semaphore_wait(self.manager.semaphore, DISPATCH_TIME_FOREVER);
     [self.manager.waitingPromptsM removeObject:prompt];
     [self.manager.queuePromptsM removeObject:prompt];
-    dispatch_semaphore_signal(self.manager.semaphore);
     
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if(prompt.moment == AKPromptMomentImmediate) {
-            [self.manager assignPromptWithMoment:AKPromptMomentImmediate];
-        }
-    });
+    if(prompt.moment == AKPromptMomentImmediate) {
+        [self.manager assignPromptWithMoment:AKPromptMomentImmediate];
+    }
+    dispatch_semaphore_signal(self.manager.semaphore);
 }
 
 #pragma mark - Private Method
 - (void)assignPromptWithMoment:(AKPromptMoment)moment {
     NSArray<id<AKPromptProtocol>> *waitingPrompts = [self.waitingPromptsM copy];
+    if(!waitingPrompts.count) {
+        return;
+    }
+    
+    BOOL isMoment = NO;
+    
     for(id<AKPromptProtocol> prompt in waitingPrompts) {
-        if(prompt.moment == AKPromptMomentImmediate
-           || prompt.moment & moment) {
-            [self.waitingPromptsM removeObject:prompt];
-            
-            NSMutableArray<id<AKPromptProtocol>> *promptsM = self.queuePromptsM;
-            
-            if(!promptsM.count) {
-                [promptsM addObject:prompt];
-                continue;
-            }
-            
-            //总是插入相同优先级之前，模仿系统
-            for(NSInteger i = 0; i < promptsM.count; i++) {
-                id<AKPromptProtocol> _prompt = promptsM[i];
-                if(prompt.priority >= _prompt.priority) {
-                    [promptsM insertObject:prompt atIndex:i];
-                    break;
-                }
-            }
-            
-            if(![promptsM containsObject:prompt]) {
-                [promptsM addObject:prompt];
+        if(prompt.moment != moment) {
+            continue;
+        }
+        
+        isMoment = YES;
+        
+        [self.waitingPromptsM removeObject:prompt];
+        
+        NSMutableArray<id<AKPromptProtocol>> *promptsM = self.queuePromptsM;
+        
+        if(!promptsM.count) {
+            [promptsM addObject:prompt];
+            continue;
+        }
+        
+        //总是插入相同优先级之前，模仿系统
+        for(NSInteger i = 0; i < promptsM.count; i++) {
+            id<AKPromptProtocol> _prompt = promptsM[i];
+            if(prompt.priority >= _prompt.priority) {
+                [promptsM insertObject:prompt atIndex:i];
+                break;
             }
         }
+        
+        if(![promptsM containsObject:prompt]) {
+            [promptsM addObject:prompt];
+        }
+    }
+    
+    if(!isMoment) {
+        return;
     }
     
     [self promptNext];
 }
 
 - (void)promptNext {
+    if(self.isOtherWindowVisible) {
+        return;
+    }
+    
     NSArray<id<AKPromptProtocol>> *queuePrompts = [self.queuePromptsM copy];
     
     //如果没有可以显示的prompt，则替换UIWindow
     if(!queuePrompts.count) {
         //已经展示的prompt需要执行完
-        if(!self.currentPrompt) {
-            if(!UIApplication.sharedApplication.delegate.window.isKeyWindow) {
-                [UIApplication.sharedApplication.delegate.window makeKeyAndVisible];
-            }
+        if(self.currentPrompt) {
+            return;
         }
+        
+        if(!UIApplication.sharedApplication.delegate.window.isKeyWindow) {
+            [UIApplication.sharedApplication.delegate.window makeKeyAndVisible];
+            self.window = nil;
+        }
+        
         return;
     }
     
@@ -196,6 +215,138 @@ static void AKPromptManagerHook() {
 }
 
 #pragma mark - NSNotification
+
+/**
+ 以下是【应用启动->系统弹窗->弹窗关闭】流程下的UIWindow变化，可见：
+ （1）系统弹窗只有BecomeVisible，并未BecomeKey
+ （2）UIApplication.sharedApplication.delegate.window不仅没有ResignKey，而且没有BecomeHidden
+ 
+name = UIWindowDidBecomeVisibleNotification; object = <UIStatusBarWindow: 0x127d097d0;
+name = UIWindowDidBecomeVisibleNotification; object = <UIWindow: 0x127d09b30;
+name = UIWindowDidBecomeKeyNotification; object = <UIWindow: 0x127d09b30;
+name = UIWindowDidBecomeVisibleNotification; object = <_UIAlertControllerShimPresenterWindow: 0x127d0d700;
+name = UIWindowDidBecomeVisibleNotification; object = <UITextEffectsWindow: 0x127d24e20;
+name = UIWindowDidBecomeHiddenNotification; object = <_UIAlertControllerShimPresenterWindow: 0x127d0d700;
+ */
+
+/**
+ 以下是【应用启动->Prompt弹窗->弹窗关闭】流程下的UIWindow变化，可见：
+ （1）自定义UIWindow有BecomeVisible，有BecomeKey
+ （2）UIApplication.sharedApplication.delegate.window有ResignKey，但是没有BecomeHidden
+ 
+name = UIWindowDidBecomeVisibleNotification; object = <UIStatusBarWindow: 0x147d04290;
+name = UIWindowDidBecomeVisibleNotification; object = <UIWindow: 0x147d05a90;
+name = UIWindowDidBecomeKeyNotification; object = <UIWindow: 0x147d05a90;
+name = UIWindowDidBecomeVisibleNotification; object = <UIWindow: 0x147e01f40;
+name = UIWindowDidResignKeyNotification; object = <UIWindow: 0x147d05a90;
+name = UIWindowDidBecomeKeyNotification; object = <UIWindow: 0x147e01f40;
+name = UIWindowDidResignKeyNotification; object = <UIWindow: 0x147e01f40;
+name = UIWindowDidBecomeKeyNotification; object = <UIWindow: 0x147d05a90;
+ */
+
+- (void)onUIWindowDidBecomeVisibleNotification:(NSNotification *)notification {
+    AKPrompterLog(@"%@", notification);
+    
+    UIWindow *currentWindow = notification.object;
+    if(![currentWindow isKindOfClass:[UIWindow class]]) {
+        return;
+    }
+    
+    if([currentWindow isKindOfClass:NSClassFromString(@"UIStatusBarWindow")]) {
+        return;
+    }
+    
+    if(currentWindow == UIApplication.sharedApplication.delegate.window
+       || currentWindow == self.window) {
+        return;
+    }
+    
+    /**
+     对于UIAlertView或者UIAlertController来讲，都会具有一个UITextEffectsWindow，但是这个Window只会触发BecomeVisible通知，而不会触发BecomeHidden通知，导致判断逻辑失效
+     */
+    if([currentWindow isKindOfClass:NSClassFromString(@"UITextEffectsWindow")]) {
+        return;
+    }
+    
+    //如果不是自定义类
+    if([NSBundle bundleForClass:[currentWindow class]] != NSBundle.mainBundle) {
+        self.otherWindowVisible = YES;
+        
+        if(!self.currentPrompt) {
+            return;
+        }
+        
+        [self.currentPrompt.content disappear];
+        self.currentPrompt = nil;
+    }
+}
+
+- (void)onUIWindowDidBecomeHiddenNotification:(NSNotification *)notification {
+    AKPrompterLog(@"%@", notification);
+    
+    UIWindow *currentWindow = notification.object;
+    if(![currentWindow isKindOfClass:[UIWindow class]]) {
+        return;
+    }
+    
+    if([currentWindow isKindOfClass:NSClassFromString(@"UIStatusBarWindow")]) {
+        return;
+    }
+    
+    if(currentWindow == UIApplication.sharedApplication.delegate.window
+       || currentWindow == self.window) {
+        return;
+    }
+    
+    if([currentWindow isKindOfClass:NSClassFromString(@"UITextEffectsWindow")]) {
+        return;
+    }
+    
+    //如果不是自定义类
+    if([NSBundle bundleForClass:[currentWindow class]] != NSBundle.mainBundle) {
+        self.otherWindowVisible = NO;
+        [self promptNext];
+    }
+}
+
+- (void)onUIWindowDidBecomeKeyNotification:(NSNotification *)notification {
+    AKPrompterLog(@"%@", notification);
+    
+    UIWindow *currentWindow = notification.object;
+    if(![currentWindow isKindOfClass:[UIWindow class]]) {
+        return;
+    }
+    
+    if(currentWindow == UIApplication.sharedApplication.delegate.window) {
+        self.otherWindowVisible = NO;
+    } else if(currentWindow == self.window) {
+        self.otherWindowVisible = NO;
+        [self promptNext];
+    }
+}
+
+- (void)onUIWindowDidResignKeyNotification:(NSNotification *)notification {
+    AKPrompterLog(@"%@", notification);
+    
+    UIWindow *currentWindow = notification.object;
+    if(![currentWindow isKindOfClass:[UIWindow class]]) {
+        return;
+    }
+    
+    if(currentWindow == UIApplication.sharedApplication.delegate.window) {
+        self.otherWindowVisible = YES;
+    } else if(currentWindow == self.window) {
+        self.otherWindowVisible = YES;
+        
+        if(!self.currentPrompt) {
+            return;
+        }
+        
+        [self.currentPrompt.content disappear];
+        self.currentPrompt = nil;
+    }
+}
+
 - (void)onUIApplicationDidFinishLaunchingNotification:(NSNotification *)notification {
     AKPrompterLog(@"UIApplicationDidFinishLaunchingNotification");
     [self assignPromptWithMoment:AKPromptMomentLaunchFinish];
@@ -215,6 +366,7 @@ static void AKPromptManagerHook() {
     
     _window = [[UIWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
     _window.backgroundColor = [UIColor.blackColor colorWithAlphaComponent:.3];
+    _window.windowLevel = UIApplication.sharedApplication.delegate.window.windowLevel;
     return _window;
 }
 
