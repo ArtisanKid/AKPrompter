@@ -8,6 +8,7 @@
 
 #import "AKTestView.h"
 #import <AKPrompter/AKPromptContentProtocol.h>
+#import <Masonry/Masonry.h>
 
 @interface AKTestView ()
 
@@ -21,7 +22,7 @@
 - (instancetype)initWithColor:(UIColor *)color targetFrame:(CGRect)frame {
     self = [super initWithFrame:CGRectZero];
     if(self) {
-        self.backgroundColor = [color colorWithAlphaComponent:.3];
+        self.backgroundColor = color;//[color colorWithAlphaComponent:.3];
         
         self.targetFrame = frame;
         
@@ -44,8 +45,8 @@
     self.hidden = NO;
     self.complete = complete;
     
-    [UIView animateWithDuration:.35 animations:^{
-        self.frame = self.targetFrame;
+    [self mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.edges.mas_equalTo(0);
     }];
 }
 

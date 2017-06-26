@@ -7,9 +7,10 @@
 //
 
 @import UIKit;
+#import "AKMainWindow.h"
 
 @interface AKAppDelegate : UIResponder <UIApplicationDelegate>
 
-@property (strong, nonatomic) UIWindow *window;
+@property (strong, nonatomic) AKMainWindow *window;
 
 @end

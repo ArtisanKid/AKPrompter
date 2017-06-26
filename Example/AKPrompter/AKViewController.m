@@ -52,7 +52,19 @@
 //
 //    return;
     
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    UIImagePickerController *imagePickerController = [[UIImagePickerController alloc] init];
+    imagePickerController.sourceType = UIImagePickerControllerSourceTypeCamera;
+    imagePickerController.allowsEditing = YES;
+    imagePickerController.delegate = (id<UINavigationControllerDelegate, UIImagePickerControllerDelegate>)self;
+    [self.navigationController presentViewController:imagePickerController animated:YES completion:^{
+        NSLog(@"");
+    }];
+    
+    //[[[UIAlertView alloc] initWithTitle:@"系统弹窗1" message:@"" delegate:nil cancelButtonTitle:@"Hidden" otherButtonTitles: nil] show];
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        //return;
+        
         AKPrompt *prompt = [[AKPrompt alloc] init];
         prompt.moment = AKPromptMomentImmediate;
         prompt.priority = AKPromptPriorityRequired;
@@ -67,18 +79,28 @@
         //[[[UIAlertView alloc] initWithTitle:@"系统弹窗2" message:@"" delegate:nil cancelButtonTitle:@"Hidden" otherButtonTitles: nil] show];
     });
     
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(15 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        return;
+        
+        [[[UIAlertView alloc] initWithTitle:@"系统弹窗1" message:@"" delegate:nil cancelButtonTitle:@"Hidden" otherButtonTitles: nil] show];
+    });
+
     return;
     
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(20 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         UIAlertController *controller = [UIAlertController alertControllerWithTitle:@"系统弹窗" message:@"" preferredStyle:UIAlertControllerStyleAlert];
         UIAlertAction *action = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
             
         }];
         [controller addAction:action];
         
-        [self presentViewController:controller animated:YES completion:^{
+        [UIApplication.sharedApplication.keyWindow.rootViewController presentViewController:controller animated:YES completion:^{
             
         }];
+        
+//        [self.navigationController presentViewController:controller animated:YES completion:^{
+//            
+//        }];
     });
     
     return;
@@ -95,18 +117,28 @@
     });
 }
 
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    
+    
+}
+
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
 
+//- (UIInterfaceOrientationMask)navigationControllerSupportedInterfaceOrientations:(UINavigationController *)navigationController {
+//    return UIInterfaceOrientationMaskPortrait;
+//}
+
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations {
-    return UIInterfaceOrientationMaskPortrait;
+    return UIInterfaceOrientationMaskAll;
 }
 
 - (BOOL)shouldAutorotate {
-    return NO;
+    return YES;
 }
 
 @end

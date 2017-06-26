@@ -7,8 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1D6BB8A81F00B95100CF9DBE /* AKCameraController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D6BB8A71F00B95100CF9DBE /* AKCameraController.m */; };
 		1D71892B1EFD21C200F926CC /* AKNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D71892A1EFD21C200F926CC /* AKNavigationController.m */; };
 		1D8FA2F71EEFC97500686E16 /* AKTestView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D8FA2F61EEFC97500686E16 /* AKTestView.m */; };
+		1DAE739A1F00DC1A00D35549 /* AKMainWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DAE73991F00DC1A00D35549 /* AKMainWindow.m */; };
 		273E522A7142DE5B8F886528 /* Pods_AKPrompter_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C6E24BE700308B0084B7E22A /* Pods_AKPrompter_Tests.framework */; };
 		6003F58E195388D20070C39A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6003F58D195388D20070C39A /* Foundation.framework */; };
 		6003F590195388D20070C39A /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6003F58F195388D20070C39A /* CoreGraphics.framework */; };
@@ -39,11 +41,15 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1D6BB8A61F00B95100CF9DBE /* AKCameraController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKCameraController.h; sourceTree = "<group>"; };
+		1D6BB8A71F00B95100CF9DBE /* AKCameraController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AKCameraController.m; sourceTree = "<group>"; };
 		1D7189291EFD21C200F926CC /* AKNavigationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKNavigationController.h; sourceTree = "<group>"; };
 		1D71892A1EFD21C200F926CC /* AKNavigationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AKNavigationController.m; sourceTree = "<group>"; };
 		1D8441B7B7E0C56CAE6D06F3 /* AKPrompter.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = AKPrompter.podspec; path = ../AKPrompter.podspec; sourceTree = "<group>"; };
 		1D8FA2F51EEFC97500686E16 /* AKTestView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKTestView.h; sourceTree = "<group>"; };
 		1D8FA2F61EEFC97500686E16 /* AKTestView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AKTestView.m; sourceTree = "<group>"; };
+		1DAE73981F00DC1A00D35549 /* AKMainWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKMainWindow.h; sourceTree = "<group>"; };
+		1DAE73991F00DC1A00D35549 /* AKMainWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AKMainWindow.m; sourceTree = "<group>"; };
 		40092D4EDC5A499923F22AD1 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		6003F58A195388D20070C39A /* AKPrompter_Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AKPrompter_Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6003F58D195388D20070C39A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -150,6 +156,10 @@
 				6003F594195388D20070C39A /* Supporting Files */,
 				1D8FA2F51EEFC97500686E16 /* AKTestView.h */,
 				1D8FA2F61EEFC97500686E16 /* AKTestView.m */,
+				1D6BB8A61F00B95100CF9DBE /* AKCameraController.h */,
+				1D6BB8A71F00B95100CF9DBE /* AKCameraController.m */,
+				1DAE73981F00DC1A00D35549 /* AKMainWindow.h */,
+				1DAE73991F00DC1A00D35549 /* AKMainWindow.m */,
 			);
 			name = "Example for AKPrompter";
 			path = AKPrompter;
@@ -407,10 +417,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1DAE739A1F00DC1A00D35549 /* AKMainWindow.m in Sources */,
 				6003F59E195388D20070C39A /* AKAppDelegate.m in Sources */,
 				6003F5A7195388D20070C39A /* AKViewController.m in Sources */,
 				1D8FA2F71EEFC97500686E16 /* AKTestView.m in Sources */,
 				1D71892B1EFD21C200F926CC /* AKNavigationController.m in Sources */,
+				1D6BB8A81F00B95100CF9DBE /* AKCameraController.m in Sources */,
 				6003F59A195388D20070C39A /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

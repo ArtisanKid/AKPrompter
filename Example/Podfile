@@ -2,6 +2,7 @@ use_frameworks!
 
 target 'AKPrompter_Example' do
   pod 'AKPrompter', :path => '../'
+  pod 'Masonry'
 
   target 'AKPrompter_Tests' do
     inherit! :search_paths

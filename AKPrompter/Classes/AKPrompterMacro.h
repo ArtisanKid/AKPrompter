@@ -12,6 +12,7 @@
 #if DEBUG
     #define AKPrompterLog(_Format, ...)\
     do {\
+        printf("\n");\
         NSString *file = [NSString stringWithUTF8String:__FILE__].lastPathComponent;\
         NSLog((@"\n[%@][%d][%s]\n" _Format), file, __LINE__, __PRETTY_FUNCTION__, ## __VA_ARGS__);\
         printf("\n");\

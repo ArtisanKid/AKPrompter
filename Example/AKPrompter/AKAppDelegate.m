@@ -15,7 +15,7 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    UIWindow *window = [[UIWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
+    AKMainWindow *window = [[AKMainWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
     self.window = window;
     [self.window makeKeyAndVisible];
     

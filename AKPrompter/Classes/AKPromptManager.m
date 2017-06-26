@@ -8,6 +8,8 @@
 
 #import "AKPromptManager.h"
 #import "AKPrompterMacro.h"
+#import "AKPromptController.h"
+#import "AKPromptWindow.h"
 
 @interface AKPromptManager ()
 
@@ -26,7 +28,7 @@
 @property (nonatomic, strong) dispatch_semaphore_t semaphore;
 
 @property (atomic, assign, getter=isOtherWindowVisible) BOOL otherWindowVisible;
-@property (nonatomic, strong) UIWindow *window;
+@property (nonatomic, strong) AKPromptWindow *window;
 
 @end
 
@@ -177,11 +179,7 @@ static void AKPromptManagerHook() {
             return;
         }
         
-        if(!UIApplication.sharedApplication.delegate.window.isKeyWindow) {
-            [UIApplication.sharedApplication.delegate.window makeKeyAndVisible];
-            self.window = nil;
-        }
-        
+        self.window = nil;
         return;
     }
     
@@ -195,7 +193,7 @@ static void AKPromptManagerHook() {
     if([self.currentPrompt.content isKindOfClass:[UIViewController class]]) {
         self.window.rootViewController = (UIViewController *)self.currentPrompt.content;
     } else if([self.currentPrompt.content isKindOfClass:[UIView class]]) {
-        self.window.rootViewController = [[UIViewController alloc] init];
+        self.window.rootViewController = [[AKPromptController alloc] init];
         [self.window.rootViewController.view addSubview:(UIView *)self.currentPrompt.content];
     } else {
         self.window.rootViewController = [[UIViewController alloc] init];
@@ -220,28 +218,35 @@ static void AKPromptManagerHook() {
  以下是【应用启动->系统弹窗->弹窗关闭】流程下的UIWindow变化，可见：
  （1）系统弹窗只有BecomeVisible，并未BecomeKey
  （2）UIApplication.sharedApplication.delegate.window不仅没有ResignKey，而且没有BecomeHidden
+ （3）通过接口获取数据可以确认，keyWindow其实是变成_UIAlertControllerShimPresenterWindow，但是没有通知
+ （4）UITextEffectsWindow只会添加一次，以后不会再添加
  
-name = UIWindowDidBecomeVisibleNotification; object = <UIStatusBarWindow: 0x127d097d0;
-name = UIWindowDidBecomeVisibleNotification; object = <UIWindow: 0x127d09b30;
-name = UIWindowDidBecomeKeyNotification; object = <UIWindow: 0x127d09b30;
-name = UIWindowDidBecomeVisibleNotification; object = <_UIAlertControllerShimPresenterWindow: 0x127d0d700;
-name = UIWindowDidBecomeVisibleNotification; object = <UITextEffectsWindow: 0x127d24e20;
-name = UIWindowDidBecomeHiddenNotification; object = <_UIAlertControllerShimPresenterWindow: 0x127d0d700;
+第一次弹窗：
+ name = UIWindowDidBecomeVisibleNotification; object = <UIStatusBarWindow: 0x127d097d0;
+ name = UIWindowDidBecomeVisibleNotification; object = <AKMainWindow: 0x127d09b30;
+ name = UIWindowDidBecomeKeyNotification; object = <AKMainWindow: 0x127d09b30;
+ name = UIWindowDidBecomeVisibleNotification; object = <_UIAlertControllerShimPresenterWindow: 0x127d0d700;
+ name = UIWindowDidBecomeVisibleNotification; object = <UITextEffectsWindow: 0x127d24e20;
+ name = UIWindowDidBecomeHiddenNotification; object = <_UIAlertControllerShimPresenterWindow: 0x127d0d700;
+ 
+第二次弹窗：
+ name = UIWindowDidBecomeVisibleNotification; object = <_UIAlertControllerShimPresenterWindow: 0x127d0d700;
+ name = UIWindowDidBecomeHiddenNotification; object = <_UIAlertControllerShimPresenterWindow: 0x127d0d700;
  */
 
 /**
- 以下是【应用启动->Prompt弹窗->弹窗关闭】流程下的UIWindow变化，可见：
+ 以下是【应用启动->Prompt弹窗->Prompt弹窗关闭】流程下的UIWindow变化，可见：
  （1）自定义UIWindow有BecomeVisible，有BecomeKey
  （2）UIApplication.sharedApplication.delegate.window有ResignKey，但是没有BecomeHidden
  
-name = UIWindowDidBecomeVisibleNotification; object = <UIStatusBarWindow: 0x147d04290;
-name = UIWindowDidBecomeVisibleNotification; object = <UIWindow: 0x147d05a90;
-name = UIWindowDidBecomeKeyNotification; object = <UIWindow: 0x147d05a90;
-name = UIWindowDidBecomeVisibleNotification; object = <UIWindow: 0x147e01f40;
-name = UIWindowDidResignKeyNotification; object = <UIWindow: 0x147d05a90;
-name = UIWindowDidBecomeKeyNotification; object = <UIWindow: 0x147e01f40;
-name = UIWindowDidResignKeyNotification; object = <UIWindow: 0x147e01f40;
-name = UIWindowDidBecomeKeyNotification; object = <UIWindow: 0x147d05a90;
+ name = UIWindowDidBecomeVisibleNotification; object = <UIStatusBarWindow: 0x147d04290;
+ name = UIWindowDidBecomeVisibleNotification; object = <AKMainWindow: 0x147d05a90;
+ name = UIWindowDidBecomeKeyNotification; object = <AKMainWindow: 0x147d05a90;
+ name = UIWindowDidBecomeVisibleNotification; object = <AKPromptWindow: 0x147e01f40;
+ name = UIWindowDidResignKeyNotification; object = <AKMainWindow: 0x147d05a90;
+ name = UIWindowDidBecomeKeyNotification; object = <AKPromptWindow: 0x147e01f40;
+ name = UIWindowDidResignKeyNotification; object = <AKPromptWindow: 0x147e01f40;
+ name = UIWindowDidBecomeKeyNotification; object = <AKMainWindow: 0x147d05a90;
  */
 
 - (void)onUIWindowDidBecomeVisibleNotification:(NSNotification *)notification {
@@ -256,14 +261,15 @@ name = UIWindowDidBecomeKeyNotification; object = <UIWindow: 0x147d05a90;
         return;
     }
     
-    if(currentWindow == UIApplication.sharedApplication.delegate.window
-       || currentWindow == self.window) {
+    if(currentWindow == UIApplication.sharedApplication.delegate.window) {
         return;
     }
     
-    /**
-     对于UIAlertView或者UIAlertController来讲，都会具有一个UITextEffectsWindow，但是这个Window只会触发BecomeVisible通知，而不会触发BecomeHidden通知，导致判断逻辑失效
-     */
+    if(currentWindow == self.window) {
+        return;
+    }
+    
+    //UIAlertController直接相关的Window是UITextEffectsWindow。这个Window类非常扯淡的就是不会发送UIWindowDidBecomeHiddenNotification。这会导致我们无法判断这个Window什么时候消失
     if([currentWindow isKindOfClass:NSClassFromString(@"UITextEffectsWindow")]) {
         return;
     }
@@ -271,6 +277,7 @@ name = UIWindowDidBecomeKeyNotification; object = <UIWindow: 0x147d05a90;
     //如果不是自定义类
     if([NSBundle bundleForClass:[currentWindow class]] != NSBundle.mainBundle) {
         self.otherWindowVisible = YES;
+        self.window = nil;
         
         if(!self.currentPrompt) {
             return;
@@ -293,8 +300,11 @@ name = UIWindowDidBecomeKeyNotification; object = <UIWindow: 0x147d05a90;
         return;
     }
     
-    if(currentWindow == UIApplication.sharedApplication.delegate.window
-       || currentWindow == self.window) {
+    if(currentWindow == UIApplication.sharedApplication.delegate.window) {
+        return;
+    }
+    
+    if(currentWindow == self.window) {
         return;
     }
     
@@ -317,9 +327,8 @@ name = UIWindowDidBecomeKeyNotification; object = <UIWindow: 0x147d05a90;
         return;
     }
     
-    if(currentWindow == UIApplication.sharedApplication.delegate.window) {
-        self.otherWindowVisible = NO;
-    } else if(currentWindow == self.window) {
+    if(currentWindow == UIApplication.sharedApplication.delegate.window
+       || currentWindow == self.window) {
         self.otherWindowVisible = NO;
         [self promptNext];
     }
@@ -333,9 +342,7 @@ name = UIWindowDidBecomeKeyNotification; object = <UIWindow: 0x147d05a90;
         return;
     }
     
-    if(currentWindow == UIApplication.sharedApplication.delegate.window) {
-        self.otherWindowVisible = YES;
-    } else if(currentWindow == self.window) {
+    if(currentWindow == self.window) {
         self.otherWindowVisible = YES;
         
         if(!self.currentPrompt) {
@@ -359,14 +366,14 @@ name = UIWindowDidBecomeKeyNotification; object = <UIWindow: 0x147d05a90;
 
 #pragma mark - Property Method
 
-- (UIWindow *)window {
+- (AKPromptWindow *)window {
     if(_window) {
         return _window;
     }
     
-    _window = [[UIWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
+    _window = [[AKPromptWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
     _window.backgroundColor = [UIColor.blackColor colorWithAlphaComponent:.3];
-    _window.windowLevel = UIApplication.sharedApplication.delegate.window.windowLevel;
+    _window.windowLevel = UIWindowLevelAlert;
     return _window;
 }
 
