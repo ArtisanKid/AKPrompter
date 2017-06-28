@@ -28,7 +28,9 @@
 @property (nonatomic, strong) dispatch_semaphore_t semaphore;
 
 @property (atomic, assign, getter=isOtherWindowVisible) BOOL otherWindowVisible;
+
 @property (nonatomic, strong) AKPromptWindow *window;
+@property (nonatomic, weak) UIWindow *lastKeyWindow;
 
 @end
 
@@ -179,6 +181,8 @@ static void AKPromptManagerHook() {
             return;
         }
         
+        self.window.windowLevel = UIWindowLevelNormal;
+        [self.lastKeyWindow makeKeyAndVisible];
         self.window = nil;
         return;
     }
@@ -196,10 +200,11 @@ static void AKPromptManagerHook() {
         self.window.rootViewController = [[AKPromptController alloc] init];
         [self.window.rootViewController.view addSubview:(UIView *)self.currentPrompt.content];
     } else {
-        self.window.rootViewController = [[UIViewController alloc] init];
+        self.window.rootViewController = [[AKPromptController alloc] init];
     }
     
     if(!self.window.isKeyWindow) {
+        self.lastKeyWindow = UIApplication.sharedApplication.keyWindow;
         [self.window makeKeyAndVisible];
     }
     

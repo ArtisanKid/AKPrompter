@@ -10,6 +10,7 @@
 #import <AKPrompter/AKPromptManager.h>
 #import <AKPrompter/AKPrompt.h>
 #import "AKTestView.h"
+#import "AKTestController.h"
 
 @interface AKViewController ()
 
@@ -52,13 +53,13 @@
 //
 //    return;
     
-    UIImagePickerController *imagePickerController = [[UIImagePickerController alloc] init];
-    imagePickerController.sourceType = UIImagePickerControllerSourceTypeCamera;
-    imagePickerController.allowsEditing = YES;
-    imagePickerController.delegate = (id<UINavigationControllerDelegate, UIImagePickerControllerDelegate>)self;
-    [self.navigationController presentViewController:imagePickerController animated:YES completion:^{
-        NSLog(@"");
-    }];
+//    UIImagePickerController *imagePickerController = [[UIImagePickerController alloc] init];
+//    imagePickerController.sourceType = UIImagePickerControllerSourceTypeCamera;
+//    imagePickerController.allowsEditing = YES;
+//    imagePickerController.delegate = (id<UINavigationControllerDelegate, UIImagePickerControllerDelegate>)self;
+//    [self.navigationController presentViewController:imagePickerController animated:YES completion:^{
+//        NSLog(@"");
+//    }];
     
     //[[[UIAlertView alloc] initWithTitle:@"系统弹窗1" message:@"" delegate:nil cancelButtonTitle:@"Hidden" otherButtonTitles: nil] show];
     
@@ -69,8 +70,9 @@
         prompt.moment = AKPromptMomentImmediate;
         prompt.priority = AKPromptPriorityRequired;
         
+        AKTestController *testController = [[AKTestController alloc] init];
         AKTestView *testView = [[AKTestView alloc] initWithColor:UIColor.greenColor targetFrame:UIScreen.mainScreen.bounds];
-        prompt.content = testView;
+        prompt.content = testController;
         
         [AKPromptManager prompt:prompt];
         
@@ -134,11 +136,11 @@
 //}
 
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations {
-    return UIInterfaceOrientationMaskAll;
+    return UIInterfaceOrientationMaskPortrait;
 }
 
 - (BOOL)shouldAutorotate {
-    return YES;
+    return NO;
 }
 
 @end
