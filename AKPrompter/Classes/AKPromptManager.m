@@ -30,7 +30,6 @@
 @property (atomic, assign, getter=isOtherWindowVisible) BOOL otherWindowVisible;
 
 @property (nonatomic, strong) AKPromptWindow *window;
-@property (nonatomic, weak) UIWindow *lastKeyWindow;
 
 @end
 
@@ -181,9 +180,7 @@ static void AKPromptManagerHook() {
             return;
         }
         
-        self.window.windowLevel = UIWindowLevelNormal;
-        [self.lastKeyWindow makeKeyAndVisible];
-        self.window = nil;
+        self.window.hidden = YES;
         return;
     }
     
@@ -204,7 +201,6 @@ static void AKPromptManagerHook() {
     }
     
     if(!self.window.isKeyWindow) {
-        self.lastKeyWindow = UIApplication.sharedApplication.keyWindow;
         [self.window makeKeyAndVisible];
     }
     
@@ -282,7 +278,6 @@ static void AKPromptManagerHook() {
     //如果不是自定义类
     if([NSBundle bundleForClass:[currentWindow class]] != NSBundle.mainBundle) {
         self.otherWindowVisible = YES;
-        self.window = nil;
         
         if(!self.currentPrompt) {
             return;
@@ -377,6 +372,7 @@ static void AKPromptManagerHook() {
     }
     
     _window = [[AKPromptWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
+    _window.rootViewController = [[UIViewController alloc] init];
     _window.backgroundColor = [UIColor.blackColor colorWithAlphaComponent:.3];
     _window.windowLevel = UIWindowLevelAlert;
     return _window;

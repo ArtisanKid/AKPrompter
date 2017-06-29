@@ -70,18 +70,27 @@
         prompt.moment = AKPromptMomentImmediate;
         prompt.priority = AKPromptPriorityRequired;
         
-        AKTestController *testController = [[AKTestController alloc] init];
+        //AKTestController *testController = [[AKTestController alloc] init];
         AKTestView *testView = [[AKTestView alloc] initWithColor:UIColor.greenColor targetFrame:UIScreen.mainScreen.bounds];
-        prompt.content = testController;
-        
+        prompt.content = testView;
         [AKPromptManager prompt:prompt];
         
-        //[[[UIAlertView alloc] initWithTitle:@"系统弹窗1" message:@"" delegate:nil cancelButtonTitle:@"Hidden" otherButtonTitles: nil] show];
+        [[[UIAlertView alloc] initWithTitle:@"系统弹窗1" message:@"" delegate:nil cancelButtonTitle:@"Hidden" otherButtonTitles: nil] show];
         
-        //[[[UIAlertView alloc] initWithTitle:@"系统弹窗2" message:@"" delegate:nil cancelButtonTitle:@"Hidden" otherButtonTitles: nil] show];
+        [[[UIAlertView alloc] initWithTitle:@"系统弹窗2" message:@"" delegate:nil cancelButtonTitle:@"Hidden" otherButtonTitles: nil] show];
     });
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(15 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        AKPrompt *prompt = [[AKPrompt alloc] init];
+        prompt.moment = AKPromptMomentImmediate;
+        prompt.priority = AKPromptPriorityRequired;
+        
+        //AKTestController *testController = [[AKTestController alloc] init];
+        AKTestView *testView = [[AKTestView alloc] initWithColor:UIColor.greenColor targetFrame:UIScreen.mainScreen.bounds];
+        prompt.content = testView;
+        [AKPromptManager prompt:prompt];
+        
+        
         return;
         
         [[[UIAlertView alloc] initWithTitle:@"系统弹窗1" message:@"" delegate:nil cancelButtonTitle:@"Hidden" otherButtonTitles: nil] show];
