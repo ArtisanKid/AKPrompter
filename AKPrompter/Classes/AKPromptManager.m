@@ -187,7 +187,7 @@ static void AKPromptManagerHook() {
     if(self.currentPrompt == queuePrompts.firstObject) {
         return;
     }
-    
+        
     [self.currentPrompt.content disappear];
     self.currentPrompt = queuePrompts.firstObject;
     
@@ -262,16 +262,15 @@ static void AKPromptManagerHook() {
         return;
     }
     
+    if([currentWindow isKindOfClass:NSClassFromString(@"UITextEffectsWindow")]) {
+        return;
+    }
+    
     if(currentWindow == UIApplication.sharedApplication.delegate.window) {
         return;
     }
     
     if(currentWindow == self.window) {
-        return;
-    }
-    
-    //UIAlertController直接相关的Window是UITextEffectsWindow。这个Window类非常扯淡的就是不会发送UIWindowDidBecomeHiddenNotification。这会导致我们无法判断这个Window什么时候消失
-    if([currentWindow isKindOfClass:NSClassFromString(@"UITextEffectsWindow")]) {
         return;
     }
     
@@ -300,15 +299,15 @@ static void AKPromptManagerHook() {
         return;
     }
     
+    if([currentWindow isKindOfClass:NSClassFromString(@"UITextEffectsWindow")]) {
+        return;
+    }
+    
     if(currentWindow == UIApplication.sharedApplication.delegate.window) {
         return;
     }
     
     if(currentWindow == self.window) {
-        return;
-    }
-    
-    if([currentWindow isKindOfClass:NSClassFromString(@"UITextEffectsWindow")]) {
         return;
     }
     
@@ -365,15 +364,15 @@ static void AKPromptManagerHook() {
 }
 
 #pragma mark - Property Method
-
 - (AKPromptWindow *)window {
     if(_window) {
         return _window;
     }
     
     _window = [[AKPromptWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
-    _window.rootViewController = [[UIViewController alloc] init];
+    _window.rootViewController = [[AKPromptController alloc] init];
     _window.backgroundColor = [UIColor.blackColor colorWithAlphaComponent:.3];
+    _window.hidden = YES;
     _window.windowLevel = UIWindowLevelAlert;
     return _window;
 }

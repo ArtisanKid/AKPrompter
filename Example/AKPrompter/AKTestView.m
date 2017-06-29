@@ -22,7 +22,7 @@
 - (instancetype)initWithColor:(UIColor *)color targetFrame:(CGRect)frame {
     self = [super initWithFrame:CGRectZero];
     if(self) {
-        self.backgroundColor = color;//[color colorWithAlphaComponent:.3];
+        self.backgroundColor = [color colorWithAlphaComponent:.3];
         
         self.targetFrame = frame;
         
